@@ -11,4 +11,4 @@ Day 2 (part 2)
 - Observed that incrementing pos 2 results in a 1-unit increase in the end result (for my inputs)
 - Therefore, we follow the function of `TARGET_VALUE = INITIAL_VALUE + 900000 * noun + 1 * verb`
 - `noun` and `verb` are bound by the length of input since they specify positions within the input
-- To make this configurable for others who'd like to try running it, constants are used (NOUN_MULTIPLIER and VERB_MULTIPLIER respectively)
+- To make this configurable for others who'd like to try running it, constants are used (`NOUN_MULTIPLIER` and `VERB_MULTIPLIER` respectively)
