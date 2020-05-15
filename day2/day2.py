@@ -36,5 +36,7 @@ VERB_MULTIPLIER = 1 # verb increments increases inputs[0] by factor of 1
 # b = 1690717
 for noun in range(len(original_inputs)):
     verb = int((TARGET_NUM - noun * NOUN_MULTIPLIER)/VERB_MULTIPLIER)
-    if verb < len(original_inputs) and verb > 0:
+    if verb < 0:
+        break
+    elif verb < len(original_inputs):
         print(noun, verb, 100 * noun + verb)
