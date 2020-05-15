@@ -10,11 +10,11 @@ def calc_fuel(mass):
     return total_fuel
 
 
-with open(Path() / 'p1.input') as inputs:
+with open(Path(__file__).parent / 'p1.input') as inputs:
     total_mass_p2 = 0
     total_mass_p1 = 0
     for mass in inputs:
-        total_mass_p1 += math.floow(int(mass)/3) - 2
+        total_mass_p1 += math.floor(int(mass)/3) - 2
         total_mass_p2 += calc_fuel(int(mass))
 
 print(total_mass_p1)
