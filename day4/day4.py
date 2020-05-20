@@ -22,7 +22,7 @@ def is_non_decreasing(number):
 
 def num_passes(low, high):
     total_passwords = 0
-    for i in range(low, high):
+    for i in range(low, high + 1):
         # test for duplicate numbers
         if has_duplicate_digits(i) and is_non_decreasing(i):
             total_passwords += 1
