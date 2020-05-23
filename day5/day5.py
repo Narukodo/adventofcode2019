@@ -3,77 +3,82 @@ from pathlib import Path
 #copy of day 2, but kept separate for record
 inputs = list(map(int, (Path(__file__).parent / 'day5.input').read_text().split(',')))
 
-# auxiliary functions
-def store_at_pos(pos, val):
-    inputs[pos] = val
-    return 1
-
-def set_pc(pc_info, new_pc_val):
-    pc_info['location'] = new_pc_val
-    pc_info['has_jumped'] = True
-    return 1
-
-def get_args(pc, args_length, param_modes):
-    args = []
-    for offset in range(1, args_length + 1):
-        args.append(inputs[pc + offset] if param_modes[offset - 1] == 1 else inputs[inputs[pc + offset]])
-    return args
-
 # ================= SYSTEM INIT =====================
 pc_info = {
     'location': 0,
     'has_jumped': False
 }
 
+
+# ================= AUXILIARY FUNCTIONS =============
+def store_at_pos(pos, val):
+    inputs[pos] = val
+    return 1
+
+
+def pc_jump_by(new_pc_val):
+    pc_info['location'] = new_pc_val
+    pc_info['has_jumped'] = True
+    return 1
+
+
+# ================= HELPER FUNCTIONS ================
+def get_current_operation_args(pc, args_length, param_modes):
+    args = []
+    for offset in range(1, args_length + 1):
+        args.append(inputs[pc + offset] if param_modes[offset - 1] == 1 else inputs[inputs[pc + offset]])
+    return args
+
+
 # ================= DEFINITIONS =====================
-ops_definitions = {
+OPCODES = {
     1: {
-        'run': lambda args, res_pos: store_at_pos(res_pos, args[0] + args[1]),
-        'op_res_pos': lambda pc: inputs[pc + 3],
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 4
+        'run_operation': lambda args, res_pos: store_at_pos(res_pos, args[0] + args[1]),
+        'get_result_position': lambda pc: inputs[pc + 3],
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 4
     },
     2: {
-        'run': lambda args, res_pos: store_at_pos(res_pos, args[0] * args[1]),
-        'op_res_pos': lambda pc: inputs[pc + 3],
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 4
+        'run_operation': lambda args, res_pos: store_at_pos(res_pos, args[0] * args[1]),
+        'get_result_position': lambda pc: inputs[pc + 3],
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 4
     },
     3: {
-        'run': lambda args, res_pos: store_at_pos(res_pos, int(input())),
-        'op_res_pos': lambda pc: inputs[pc + 1],
-        'num_args': 0,
-        'pc_inc_val': lambda has_jumped: 2
+        'run_operation': lambda args, res_pos: store_at_pos(res_pos, int(input())),
+        'get_result_position': lambda pc: inputs[pc + 1],
+        'number_of_args': 0,
+        'pc_increment_by': lambda has_jumped: 2
     },
     4: {
-        'run': lambda args, res_pos: print(args[0]),
-        'op_res_pos': lambda pc: -1,
-        'num_args': 1,
-        'pc_inc_val': lambda has_jumped: 2
+        'run_operation': lambda args, res_pos: print(args[0]),
+        'get_result_position': lambda pc: -1,
+        'number_of_args': 1,
+        'pc_increment_by': lambda has_jumped: 2
     },
     5: {
-        'run': lambda args, res_pos: set_pc(pc_info, args[1]) if bool(args[0]) else None,
-        'op_res_pos': lambda pc: -1,
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 3 if not has_jumped else 0
+        'run_operation': lambda args, res_pos: pc_jump_by(args[1]) if bool(args[0]) else None,
+        'get_result_position': lambda pc: -1,
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 3 if not has_jumped else 0
     },
     6: {
-        'run': lambda args, res_pos: set_pc(pc_info, args[1]) if not bool(args[0]) else None,
-        'op_res_pos': lambda pc: -1,
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 3 if not has_jumped else 0
+        'run_operation': lambda args, res_pos: pc_jump_by(args[1]) if not bool(args[0]) else None,
+        'get_result_position': lambda pc: -1,
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 3 if not has_jumped else 0
     },
     7: {
-        'run': lambda args, res_pos: store_at_pos(res_pos, int(args[0] < args[1])),
-        'op_res_pos': lambda pc: inputs[pc + 3],
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 4
+        'run_operation': lambda args, res_pos: store_at_pos(res_pos, int(args[0] < args[1])),
+        'get_result_position': lambda pc: inputs[pc + 3],
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 4
     },
     8: {
-        'run': lambda args, res_pos: store_at_pos(res_pos, int(args[0] == args[1])),
-        'op_res_pos': lambda pc: inputs[pc + 3],
-        'num_args': 2,
-        'pc_inc_val': lambda has_jumped: 4
+        'run_operation': lambda args, res_pos: store_at_pos(res_pos, int(args[0] == args[1])),
+        'get_result_position': lambda pc: inputs[pc + 3],
+        'number_of_args': 2,
+        'pc_increment_by': lambda has_jumped: 4
     }
 }
     
@@ -86,14 +91,14 @@ def run_intcode_machine():
         op_code, modes = param_mode(str(inputs[pc_info['location']]).zfill(5))
 
         # get args and result positions
-        args = get_args(pc_info['location'], ops_definitions[op_code]['num_args'], modes)
-        res_pos = ops_definitions[op_code]['op_res_pos'](pc_info['location'])
+        args = get_current_operation_args(pc_info['location'], OPCODES[op_code]['number_of_args'], modes)
+        res_pos = OPCODES[op_code]['get_result_position'](pc_info['location'])
 
         # run op
-        ops_definitions[op_code]['run'](args, res_pos)
+        OPCODES[op_code]['run_operation'](args, res_pos)
 
         # increment pc
-        pc_info['location'] += ops_definitions[op_code]['pc_inc_val'](pc_info['has_jumped'])
+        pc_info['location'] += OPCODES[op_code]['pc_increment_by'](pc_info['has_jumped'])
         pc_info['has_jumped'] = False
 
 run_intcode_machine()
