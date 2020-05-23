@@ -12,3 +12,6 @@ Day 2 (part 2)
 - Therefore, we follow the function of `TARGET_VALUE = INITIAL_VALUE + 900000 * noun + 1 * verb`
 - `noun` and `verb` are bound by the length of input since they specify positions within the input
 - To make this configurable for others who'd like to try running it, constants are used (`NOUN_MULTIPLIER` and `VERB_MULTIPLIER` respectively)
+
+Day 5
+The intcode machine's given a full refactor to run on rules rather than if statements. The hope is to make the infrastructure scalable. Adding an operation is just a matter of adding its definition, specifyin its parameter locations, and specifying where to store its result, if it has one. Due to Python 3.7's restrictions on lambdas, auxiliary functions have to be made to allow things such as assignment, so hopefully moving forward there will be a workaround.
